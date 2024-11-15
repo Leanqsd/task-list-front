@@ -1,5 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import TaskComponent from '@/components/HomeComponent.vue'
+</script>
 
 <template>
-  <h1>Home</h1>
+  <TaskComponent />
 </template>
