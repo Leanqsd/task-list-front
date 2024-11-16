@@ -1,4 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useTasksStore } from '@/stores/tasksStore';
+
+const tasksStore = useTasksStore();
+const title = ref('');
+const description = ref('');
+
+const createTask = async () => {
+  await tasksStore.createTask({ title: title.value, description: description.value });
+  title.value = '';
+  description.value = '';
+};
+
+</script>
 
 <template>
   <div class="w-full bg-white dark:bg-gray-900 shadow-md p-6 h-full">
