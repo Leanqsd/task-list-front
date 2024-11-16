@@ -9,8 +9,9 @@ export const registerUser = (credentials: CredentialsModel) => {
 
 // Función para iniciar sesión
 export const loginUser = (credentials: CredentialsModel) => {
-  return axiosInstance.post('/auth/login', credentials);
-};
+    console.log('Logging in with credentials:', credentials); // Agrega este log
+    return axiosInstance.post('/auth/login', credentials);
+  };
 
 // Función para renovar el token (si lo implementas en tu backend)
 export const renewToken = (refreshToken: string) => {

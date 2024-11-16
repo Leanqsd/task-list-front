@@ -37,7 +37,7 @@ export const useAuthStore = defineStore({
       try {
         const response = await registerUser(credentials); // Usamos la función del servicio
         if (response.status === 201) {
-          console.info('[AuthStore] Usuario Creado, código de respuesta:', response.status);
+          console.log('[AuthStore] Usuario Creado, código de respuesta:', response.status);
           this.login(credentials); // Autologin después de registrar al usuario
         }
         this.loading = false;
@@ -50,32 +50,32 @@ export const useAuthStore = defineStore({
 
     // Acción asincrónica para iniciar sesión
     async login(credentials: CredentialsModel) {
-      this.loading = true;
-      try {
-        const { data }: { data: AuthApiResponseModel } = await loginUser(credentials); // Usamos la función del servicio
-
-        if (data) {
-          // Guardar datos del usuario en el estado
-          this.data!.user = {
-            userId: data.userId,
-            email: credentials.email,
-            token: data.token,
-            refreshToken: data.refreshToken,
-          };
-          const currentEpochTime = Math.floor(Date.now() / 1000);
-          this.data!.jwtExpires = currentEpochTime + 3 * 60; // El token expira en 3 minutos
-
-          console.info('[AuthStore] Usuario Logeado, código de respuesta:', data);
-
+        this.loading = true;
+        try {
+          const { data }: { data: AuthApiResponseModel } = await loginUser(credentials);
+          console.log('Login response:', data); // Agrega este log
+       if (data) {
+                // Guardar datos del usuario en el estado
+                this.data!.user = {
+                  userId: data.userId,
+                  email: credentials.email,
+                  token: data.token,
+                  refreshToken: data.refreshToken,
+                };
+                const currentEpochTime = Math.floor(Date.now() / 1000);
+                this.data!.jwtExpires = currentEpochTime + 3 * 60; // El token expira en 3 minutos
+      
+                console.info('[AuthStore] Usuario Logeado, código de respuesta:', data);
+      
+                this.loading = false;
+                router.push('/tasks'); // Redirigir al usuario a la página de tareas
+              }
+        } catch (e: any) {
+          console.error('Login error:', e.response?.data || e.message); // Log completo del error
+          this.error = e.response?.data?.message || 'Error desconocido al iniciar sesión';
           this.loading = false;
-          router.push('/tasks'); // Redirigir al usuario a la página de tareas
         }
-      } catch (e) {
-        console.error('[AuthStore] Error al loggear al usuario', e);
-        this.error = e!.toString();
-        this.loading = false;
-      }
-    },
+      },
 
     // Acción para cerrar sesión
     async logout(): Promise<void> {

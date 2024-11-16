@@ -9,10 +9,10 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(async (config) => {
-  // Obtener CSRF Token antes de cada solicitud si es necesario
   if (!config.url.includes('/auth/csrf')) {
     const { data } = await axiosInstance.get('/auth/csrf');
-    config.headers['X-CSRF-Token'] = data.csrfToken;
+    config.headers['X-CSRF-Token'] = data.csrfToken; // Incluye el token CSRF en la solicitud
+    console.log('CSRF Token actualizado:', data.csrfToken);
   }
   return config;
 });
