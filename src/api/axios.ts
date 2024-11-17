@@ -8,11 +8,16 @@ const axiosInstance = axios.create({
   },
 });
 
+// Interceptor para manejar el token CSRF
 axiosInstance.interceptors.request.use(async (config) => {
-  if (!config.url.includes('/auth/csrf')) {
-    const { data } = await axiosInstance.get('/auth/csrf');
-    config.headers['X-CSRF-Token'] = data.csrfToken; // Incluye el token CSRF en la solicitud
-    console.log('CSRF Token actualizado:', data.csrfToken);
+  if (!config.url?.includes('/auth/csrf')) {
+    try {
+      const { data } = await axiosInstance.get('/auth/csrf');
+      config.headers['X-CSRF-Token'] = data.csrfToken;
+      console.log('[Axios] CSRF Token actualizado:', data.csrfToken);
+    } catch (error) {
+      console.error('[Axios] Error obteniendo CSRF Token:', error);
+    }
   }
   return config;
 });

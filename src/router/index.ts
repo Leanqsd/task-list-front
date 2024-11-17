@@ -13,7 +13,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  if (!authStore.data && to.path !== '/login') {
+  if (!authStore.isAuthenticated && to.path !== '/login') {
     return next('/login');
   }
   next();
