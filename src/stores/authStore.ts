@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = true;
         this.jwtExpires = Math.floor(Date.now() / 1000) + 3 * 60; // Token válido por 3 minutos
         console.info('[AuthStore] Usuario logueado correctamente:', data);
-        router.push('/tasks');
+        router.push('/');
       } catch (error: any) {
         console.error('[AuthStore] Error al iniciar sesión:', error.response?.data || error.message);
         this.error = error.response?.data?.message || 'Error al iniciar sesión';
