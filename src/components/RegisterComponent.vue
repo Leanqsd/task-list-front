@@ -9,6 +9,7 @@ const authStore = useAuthStore();
 
 async function handleRegister() {
   try {
+    await authStore.loadCsrfToken();  // Cambiar fetchCsrfToken a loadCsrfToken
     await authStore.registerUser({
       username: username.value,
       email: email.value,

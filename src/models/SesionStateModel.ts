@@ -4,7 +4,7 @@ export interface SesionStateModel {
   isAuthenticated: boolean;
   user: AuthModel | null;
   jwtExpires: number | undefined;
-  crsfToken: string | undefined;
+  csrfToken: string | undefined;
   error: string;
-  loading: boolean; // Agregar esta línea
+  loading: boolean;
 }

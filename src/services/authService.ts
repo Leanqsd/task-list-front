@@ -3,9 +3,14 @@ import type { CredentialsModel } from '@/models/CredentialsModel';
 import type { AuthApiResponseModel } from '@/models/AuthApiResponseModel';
 
 // Función para registrar un nuevo usuario
-export const registerUser = async (credentials: CredentialsModel) => {
-  return await axiosInstance.post<AuthApiResponseModel>('/auth/signup', credentials);
-};
+export async function registerUser(credentials: CredentialsModel, csrfToken: string) {
+    const response = await axiosInstance.post('/auth/signup', credentials, {
+      headers: {
+        'X-CSRF-Token': csrfToken,
+      },
+    });
+    return response.data;
+  }
 
 // Función para iniciar sesión
 export const loginUser = async (credentials: CredentialsModel) => {
@@ -17,3 +22,13 @@ export const loginUser = async (credentials: CredentialsModel) => {
 export const renewToken = async (refreshToken: string) => {
   return await axiosInstance.post('/auth/renew-token', { refreshToken });
 };
+
+export async function getCsrfToken(): Promise<string> {
+    try {
+      const response = await axiosInstance.get('/auth/csrf');
+      return response.data.csrfToken; // Suponiendo que la respuesta tiene un campo csrfToken
+    } catch (error) {
+      throw new Error('Error obteniendo CSRF Token');
+    }
+  }
+  
