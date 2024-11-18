@@ -56,6 +56,16 @@ export const useTasksStore = defineStore('tasks', {
         console.error('Error updating task:', error);
       }
     },
+    async markAsCompleted(id: number) {
+      try {
+        const response = await TaskAPI.updateTask(id, { isCompleted: true });
+        this.tasks = this.tasks.map((task) =>
+          task.id === id ? { ...task, ...response.data } : task
+        );
+      } catch (error) {
+        console.error('Error marking task as completed:', error);
+      }
+    },
 
     async deleteTask(id: number) {
       try {
