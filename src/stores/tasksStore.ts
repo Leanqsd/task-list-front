@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
-import {
-  TaskModel,
-  TaskApiResponseModel,
-  TaskRequestModel,
-  UpdateTaskRequestModel,
-} from '@/models';
+import { TaskAPI } from '@/services/TaskService';
+import { TaskModel } from '@/models/TaskModel';
+import { TaskRequestModel } from '@/models/TaskRequestModels';
 
 export const useTasksStore = defineStore('tasks', {
   state: () => ({
@@ -14,28 +10,60 @@ export const useTasksStore = defineStore('tasks', {
   }),
 
   actions: {
-    async fetchTasks(): Promise<void> {
+    async fetchTasks() {
       this.loading = true;
-      const { data }: { data: TaskApiResponseModel } = await axios.get('/todo');
-      this.tasks = data.tasks;
-      this.loading = false;
+      try {
+        const response = await TaskAPI.getTasks();
+        this.tasks = response.data.tasks || []; // Asegúrate de asignar un arreglo vacío si no hay tareas
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        this.loading = false;
+      }
+    }
+    ,
+
+    async createTask(task: TaskRequestModel) {
+      try {
+        const response = await TaskAPI.createTask(task);
+    
+        console.log('Estado actual de tasks antes de push:', this.tasks);
+    
+        if (!response || !response.data) {
+          throw new Error('Invalid response data from API');
+        }
+    
+        if (!Array.isArray(this.tasks)) {
+          throw new Error('Estado de tasks no es un arreglo');
+        }
+    
+        this.tasks = this.tasks || []; // Inicialización segura
+        this.tasks.push(response.data);
+    
+        console.log('Estado actual de tasks después de push:', this.tasks);
+      } catch (error) {
+        console.error('Error creating task:', error);
+      }
     },
 
-    async createTask(task: TaskRequestModel): Promise<void> {
-      const { data }: { data: TaskModel } = await axios.post('/todo', task);
-      this.tasks.push(data);
+    async updateTask(id: number, updates: Partial<TaskModel>) {
+      try {
+        const response = await TaskAPI.updateTask(id, updates);
+        this.tasks = this.tasks.map((task) =>
+          task.id === id ? { ...task, ...response.data } : task
+        );
+      } catch (error) {
+        console.error('Error updating task:', error);
+      }
     },
 
-    async updateTask(id: string, updates: UpdateTaskRequestModel): Promise<void> {
-      const { data }: { data: TaskModel } = await axios.patch(`/todo/${id}`, updates);
-      this.tasks = this.tasks.map((task: TaskModel) =>
-        task.id === id ? { ...task, ...data } : task
-      );
-    },
-
-    async deleteTask(id: string): Promise<void> {
-      await axios.delete(`/todo/${id}`);
-      this.tasks = this.tasks.filter((task: TaskModel) => task.id !== id);
+    async deleteTask(id: number) {
+      try {
+        await TaskAPI.deleteTask(id);
+        this.tasks = this.tasks.filter((task) => task.id !== id);
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      }
     },
   },
 });

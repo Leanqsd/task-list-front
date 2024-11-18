@@ -5,12 +5,16 @@ import { useTasksStore } from '@/stores/tasksStore';
 const tasksStore = useTasksStore();
 const title = ref(''); // Define las referencias reactivas
 const description = ref('');
-
 const createTask = async () => {
-  await tasksStore.createTask({ title: title.value, description: description.value });
-  title.value = '';
-  description.value = '';
+  try {
+    await tasksStore.createTask({ title: title.value, description: description.value });
+    title.value = '';
+    description.value = '';
+  } catch (error) {
+    console.error('Error while creating task in the component:', error);
+  }
 };
+
 </script>
 
 <template>
