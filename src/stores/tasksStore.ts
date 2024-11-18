@@ -58,7 +58,9 @@ export const useTasksStore = defineStore('tasks', {
     },
     async markAsCompleted(id: number) {
       try {
-        const response = await TaskAPI.updateTask(id, { isCompleted: true });
+        const updateData = { isCompleted: true };
+        console.log('Sending update data:', updateData); // Depuración
+        const response = await TaskAPI.updateTask(id, updateData);
         this.tasks = this.tasks.map((task) =>
           task.id === id ? { ...task, ...response.data } : task
         );
