@@ -12,7 +12,7 @@ const password = ref('');
 // Función para iniciar sesión
 const login = async () => {
   try {
-    await authStore.fetchCsrfToken();
+    await authStore.loadCsrfToken();
     await authStore.login({ email: email.value, password: password.value });
   } catch (error) {
     console.error('Error during login:', error);
