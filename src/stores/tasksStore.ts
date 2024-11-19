@@ -14,12 +14,21 @@ export const useTasksStore = defineStore('tasks', {
       this.loading = true;
       try {
         const response = await TaskAPI.getTasks();
-        this.tasks = response.data.tasks || []; // Asegúrate de asignar un arreglo vacío si no hay tareas
+        this.tasks = response.data.tasks.map((task) => ({
+          ...task,
+          isCompleted: false, // Inicializa localmente como no completado
+        }));
       } catch (error) {
         console.error('Error fetching tasks:', error);
       } finally {
         this.loading = false;
       }
+    },
+
+    markAsCompletedLocally(id: number) {
+      this.tasks = this.tasks.map((task: TaskModel) =>
+        Number(task.id) === id ? { ...task, isCompleted: true } : task
+      );
     },
 
     async createTask(task: TaskRequestModel) {
@@ -57,30 +66,28 @@ export const useTasksStore = defineStore('tasks', {
     },
     async markAsCompleted(id: number) {
       try {
-        // Encuentra la tarea en la lista de tareas actuales
+        // Encuentra la tarea
         const taskToUpdate = this.tasks.find(task => task.id === id);
         if (!taskToUpdate) {
           console.error('Task not found');
           return;
         }
-
-        // Crear el objeto completo con los datos actuales de la tarea + la actualización
-        const updateData = { ...taskToUpdate, isCompleted: true };
-
-        console.log('Sending updated task data:', updateData); // Depuración
-
-        // Enviar el objeto completo en la solicitud PATCH
-        const response = await TaskAPI.updateTask(id, updateData);
-
-        // Actualiza la lista de tareas con los nuevos datos
-        this.tasks = this.tasks.map((task) =>
-          task.id === id ? { ...task, ...response.data } : task
-        );
+    
+        // Actualiza localmente primero para una respuesta más rápida
+        taskToUpdate.isCompleted = true;
+    
+        // Enviar actualización al backend
+        await TaskAPI.updateTask(id, { isCompleted: true });
       } catch (error) {
-        console.error('Error marking task as completed:', error.response ? error.response.data : error.message);
+        console.error('Error marking task as completed:', error);
+        // Si hay un error, revertir el cambio local
+        const taskToRevert = this.tasks.find(task => task.id === id);
+        if (taskToRevert) {
+          taskToRevert.isCompleted = false;
+        }
       }
     },
-
+    
     async deleteTask(id: number) {
       try {
         await TaskAPI.deleteTask(id);
