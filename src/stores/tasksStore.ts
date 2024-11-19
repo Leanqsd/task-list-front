@@ -73,29 +73,6 @@ export const useTasksStore = defineStore('tasks', {
         console.error('Error updating task:', error);
       }
     },
-    async markAsCompleted(id: number) {
-      try {
-        // Encuentra la tarea
-        const taskToUpdate = this.tasks.find(task => task.id === id);
-        if (!taskToUpdate) {
-          console.error('Task not found');
-          return;
-        }
-    
-        // Actualiza localmente primero para una respuesta más rápida
-        taskToUpdate.isCompleted = true;
-    
-        // Enviar actualización al backend
-        await TaskAPI.updateTask(id, { isCompleted: true });
-      } catch (error) {
-        console.error('Error marking task as completed:', error);
-        // Si hay un error, revertir el cambio local
-        const taskToRevert = this.tasks.find(task => task.id === id);
-        if (taskToRevert) {
-          taskToRevert.isCompleted = false;
-        }
-      }
-    },
     
     async deleteTask(id: number) {
       try {
