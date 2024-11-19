@@ -16,6 +16,9 @@ async function handleRegister() {
       password: password.value,
     });
   } catch (error) {
+    throw new Error(error);
+
+    alert.error()
     console.error('[RegisterComponent] Error al registrar:', error);
   }
 }
@@ -46,6 +49,7 @@ async function handleRegister() {
           placeholder="your@email.com"
           required
         />
+
       </div>
       <div class="mb-4">
         <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>

@@ -18,14 +18,14 @@ const createTask = async () => {
 </script>
 
 <template>
-  <div class="w-full bg-white dark:bg-gray-900 shadow-md p-6 h-full">
-    <form 
+  <div class="w-full bg-gray-900 shadow-md p-6 h-full">
+    <form
       class="flex flex-wrap -mx-3 mb-6"
-      @submit.prevent="createTask" 
+      @submit.prevent="createTask"
     >
       <div class="w-full px-3 mb-6">
         <label
-          class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+          class="block uppercase tracking-wide text-gray-700 text-sm font-bold mb-2"
           for="task_name"
         >
           Create your Task

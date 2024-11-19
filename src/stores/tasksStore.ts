@@ -20,26 +20,25 @@ export const useTasksStore = defineStore('tasks', {
       } finally {
         this.loading = false;
       }
-    }
-    ,
+    },
 
     async createTask(task: TaskRequestModel) {
       try {
         const response = await TaskAPI.createTask(task);
-    
+
         console.log('Estado actual de tasks antes de push:', this.tasks);
-    
+
         if (!response || !response.data) {
           throw new Error('Invalid response data from API');
         }
-    
+
         if (!Array.isArray(this.tasks)) {
           throw new Error('Estado de tasks no es un arreglo');
         }
-    
+
         this.tasks = this.tasks || []; // Inicialización segura
         this.tasks.push(response.data);
-    
+
         console.log('Estado actual de tasks después de push:', this.tasks);
       } catch (error) {
         console.error('Error creating task:', error);
@@ -58,14 +57,27 @@ export const useTasksStore = defineStore('tasks', {
     },
     async markAsCompleted(id: number) {
       try {
-        const updateData = { isCompleted: true };
-        console.log('Sending update data:', updateData); // Depuración
+        // Encuentra la tarea en la lista de tareas actuales
+        const taskToUpdate = this.tasks.find(task => task.id === id);
+        if (!taskToUpdate) {
+          console.error('Task not found');
+          return;
+        }
+
+        // Crear el objeto completo con los datos actuales de la tarea + la actualización
+        const updateData = { ...taskToUpdate, isCompleted: true };
+
+        console.log('Sending updated task data:', updateData); // Depuración
+
+        // Enviar el objeto completo en la solicitud PATCH
         const response = await TaskAPI.updateTask(id, updateData);
+
+        // Actualiza la lista de tareas con los nuevos datos
         this.tasks = this.tasks.map((task) =>
           task.id === id ? { ...task, ...response.data } : task
         );
       } catch (error) {
-        console.error('Error marking task as completed:', error);
+        console.error('Error marking task as completed:', error.response ? error.response.data : error.message);
       }
     },
 
