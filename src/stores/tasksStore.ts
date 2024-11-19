@@ -13,23 +13,32 @@ export const useTasksStore = defineStore('tasks', {
     async fetchTasks() {
       this.loading = true;
       try {
-        const response = await TaskAPI.getTasks();
-        this.tasks = response.data.tasks.map((task) => ({
-          ...task,
-          isCompleted: false, // Inicializa localmente como no completado
-        }));
+        const storedTasks = localStorage.getItem('tasks');
+        if (storedTasks) {
+          this.tasks = JSON.parse(storedTasks);
+        } else {
+          const response = await TaskAPI.getTasks();
+          this.tasks = response.data.tasks.map((task) => ({
+            ...task,
+            isCompleted: false,
+          }));
+          localStorage.setItem('tasks', JSON.stringify(this.tasks));
+        }
       } catch (error) {
         console.error('Error fetching tasks:', error);
       } finally {
         this.loading = false;
       }
     },
+    
 
     markAsCompletedLocally(id: number) {
-      this.tasks = this.tasks.map((task: TaskModel) =>
-        Number(task.id) === id ? { ...task, isCompleted: true } : task
+      this.tasks = this.tasks.map((task) =>
+        task.id === id ? { ...task, isCompleted: true } : task
       );
+      localStorage.setItem('tasks', JSON.stringify(this.tasks));
     },
+    
 
     async createTask(task: TaskRequestModel) {
       try {
